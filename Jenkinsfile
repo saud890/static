@@ -1,17 +1,17 @@
 pipeline {
   agent any
   stages {
-    stage('Upload to AWS') {
-      steps { 
-          withAWS(credentials: 'aws-credentials', region: 'eu-west-1') {
-              sh 'echo "Hello World"'
-              sh '''
-              s3Upload(file:'index.html', bucket:'saudbucket', path:'path /index.html')
-                     echo "Multiline shell steps works too"
-                     ls -lah
-                 '''
+    stage('Lint HTML') {
+      steps {
+        sh 'tidy -q -e *.html'
       }
     }
+    stage('Upload to AWS') {
+      steps {
+        withAWS(region:'eu-west-1', credentials:'static') {
+          s3Upload(file:'index.html', bucket:'saudbucket', path:'')
+        }
+      }
     }
   }
 }
